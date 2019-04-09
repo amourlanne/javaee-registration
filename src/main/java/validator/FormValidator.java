@@ -10,22 +10,15 @@ import java.util.List;
  */
 public abstract class FormValidator {
 
-    protected HttpServletRequest request;
-    private List<String> errors;
+    protected List<String> errors;
     protected boolean valid;
 
-    public FormValidator(HttpServletRequest request) {
-        this.request = request;
+    public FormValidator() {
         this.valid = false;
         this.errors = new ArrayList<>();
     }
 
-    public void init() {
-        this.errors.clear();
-        this.valid = true;
-    }
-
-    public abstract boolean validate();
+    public abstract boolean isValid();
 
     public List<String> getErrors() {
         return errors;
@@ -35,10 +28,4 @@ public abstract class FormValidator {
         this.errors.add(error);
     }
 
-    public void validateInput(boolean valid, String error) {
-        if(!valid) {
-            this.valid = false;
-            this.addError(error);
-        }
-    }
 }

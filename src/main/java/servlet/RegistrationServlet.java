@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Date;
 
 @WebServlet("/registration")
 public class RegistrationServlet extends HttpServlet {
@@ -21,17 +20,22 @@ public class RegistrationServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        RegistrationFormValidator validator = new RegistrationFormValidator(request);
-        Boolean isValid = validator.validate();
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String passwordRepeat = request.getParameter("password-repeat");
+        boolean approvedTerms = Boolean.parseBoolean(request.getParameter("approved-terms"));
 
-        if(isValid) {
-            Inscription inscription = new Inscription(request.getParameter("email"), new Date());
+        RegistrationFormValidator validator = new RegistrationFormValidator(approvedTerms, email, password, passwordRepeat);
+
+        if(validator.isValid()) {
+            Inscription inscription = validator.getInscription();
+            // Persist inscription
             request.setAttribute("inscription", inscription);
+            this.getServletContext().getRequestDispatcher( "/registration-success.jsp" ).forward( request, response );
         } else {
-            request.setAttribute("email", request.getParameter("email"));
+            request.setAttribute("email", email);
             request.setAttribute("errors", validator.getErrors());
+            this.getServletContext().getRequestDispatcher( "/registration.jsp" ).forward( request, response );
         }
-
-        this.getServletContext().getRequestDispatcher( "/registration.jsp" ).forward( request, response );
     }
 }

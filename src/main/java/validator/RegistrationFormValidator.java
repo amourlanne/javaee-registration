@@ -1,6 +1,8 @@
 package validator;
 
-import javax.servlet.http.HttpServletRequest;
+import entity.Inscription;
+
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,43 +12,62 @@ import java.util.regex.Pattern;
  */
 public class RegistrationFormValidator extends FormValidator {
 
-    public RegistrationFormValidator(HttpServletRequest request) {
-        super(request);
+    private boolean approvedTerms;
+    private String email;
+    private String password;
+    private String passwordRepeat;
+
+    private Inscription inscription;
+
+    public RegistrationFormValidator(boolean approvedTerms,
+                                     String email,
+                                     String password,
+                                     String passwordRepeat ) {
+        super();
+        this.approvedTerms = approvedTerms;
+        this.email = email;
+        this.password = password;
+        this.passwordRepeat = passwordRepeat;
+        this.valid = false;
     }
 
-    @Override
-    public boolean validate() {
-
-        this.init();
-
-        this.validateEmail();
-        this.validatePassword();
-        this.validateApprovedTerms();
-
-        return valid;
+    public Inscription getInscription() {
+        return inscription;
     }
 
-    private void validateApprovedTerms() {
-        boolean approvedTerms = Boolean.parseBoolean(request.getParameter("approved-terms"));
-        this.validateInput(approvedTerms, "Terms must be approved");
-    }
+    public boolean isValid() {
 
-    private void validateEmail() {
+        valid = true;
 
-        String email = request.getParameter("email");
+        this.errors.clear();
+
+        if(!approvedTerms) {
+            valid = false;
+            this.addError("Terms must be approved");
+        }
 
         String regex = "^(.+)@(.+)$";
 
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(email);
 
-        this.validateInput(matcher.matches(),"Invalid Email" );
-    }
+        if(!matcher.matches()) {
+            valid = false;
+            this.addError("Invalid Email");
+        }
 
-    private void validatePassword() {
-        String password = request.getParameter("password");
-        String passwordRepeat = request.getParameter("password-repeat");
-        this.validateInput(password.length() >= 8, "Password must have a minimum of 8 character" );
-        this.validateInput(password.equals(passwordRepeat), "Both password mus be equals");
+        if(password.length() < 8) {
+            valid = false;
+            this.addError("Password must have a minimum of 8 character");
+        }
+
+        if(!password.equals(passwordRepeat)) {
+            valid = false;
+            this.addError("Both password mus be equals");
+        }
+
+        if(valid) this.inscription = new Inscription(email, new Date());
+
+        return valid;
     }
 }

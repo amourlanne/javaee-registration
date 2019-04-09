@@ -18,23 +18,14 @@
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.8/css/all.css">
 
-<div class="container">
-    <c:if test="${not empty inscription}">
-        <div class="card bg-success mt-4">
-            <article class="card-body mx-auto" style="max-width: 400px;">
-                <h4 class="card-title mt-3 text-center text-white">Registration success</h4>
-                <p class="text-center text-white">Your registration has been taken into account the <fmt:formatDate pattern="dd/MM/yyyy" value="${inscription.date}"/> at <fmt:formatDate pattern="HH:mm:ss" value="${inscription.date}"/> for the email address ${inscription.email}</p>
-            </article>
+<div class="container mt-4">
+    <c:forEach items="${errors}" var="error">
+        <div class="alert alert-danger" role="alert">
+                ${error}
         </div>
-    </c:if>
-
+    </c:forEach>
     <div class="card bg-light mt-4">
         <article class="card-body mx-auto" style="max-width: 400px;">
-            <c:forEach items="${errors}" var="error">
-                <div class="alert alert-danger" role="alert">
-                        ${error}
-                </div>
-            </c:forEach>
             <h4 class="card-title mt-3 text-center">Create Account</h4>
             <p class="text-center">Get started with your free account</p>
             <form method="post">
